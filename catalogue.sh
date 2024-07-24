@@ -26,13 +26,13 @@ else
     echo "you are a super user"
 fi
 
-dnf module disable nodejs -y
+dnf module disable nodejs -y &>>$LOGFILE
 VALIDATE $? "disble old version off Nodejs"
 
-dnf module enable nodejs:20 -y
+dnf module enable nodejs:20 -y &>>$LOGFILE
 VALIDATE $? "Enable Nodejs version:20"
 
-dnf install nodejs -y
+dnf install nodejs -y &>>$LOGFILE
 VALIDATE $? "Install Nodejs"
 
 if [ "id roboshop" -ne 0 ]
@@ -44,36 +44,36 @@ else
     echo "roboshop user already exist"
 fi
 
-rm -rf /app
-mkdir /app
+rm -rf /app &>>$LOGFILE
+mkdir /app &>>$LOGFILE
 
-curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip
+curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>>$LOGFILE
 VALIDATE $? "Download the application"
 
 cd /app 
-unzip /tmp/catalogue.zip
+unzip /tmp/catalogue.zip &>>$LOGFILE
 VALIDATE $? "Unzip the appication"
 
-npm install 
+npm install &>>$LOGFILE
 VALIDATE $? "Install the dependencies"
 
-cp catalogue.service /etc/systemd/system/catalogue.service
+cp catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
 VALIDATE $? "copy the catalogue service file"
 
-systemctl daemon-reload
+systemctl daemon-reload &>>$LOGFILE
 VALIDATE $? "Relaod the system daemon"
 
-systemctl enable catalogue
+systemctl enable catalogue &>>$LOGFILE
 VALIDATE $? "Enable catalogue service"
 
-systemctl start catalogue
+systemctl start catalogue &>>$LOGFILE
 VALIDATE $? "Start catalogue service"
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo
+cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFILE
 VALIDATE $? "copy the MongoDB repo"
 
-dnf install -y mongodb-mongosh
+dnf install -y mongodb-mongosh &>>$LOGFILE
 VALIDATE $? "Install the mongodb clinet"
 
-mongosh --host mongodb.mahidevops.cloud </app/schema/catalogue.js
+mongosh --host mongodb.mahidevops.cloud </app/schema/catalogue.js &>>$LOGFILE
 VALIDATE $? "Load the catalogue application schema to MongoDB"
