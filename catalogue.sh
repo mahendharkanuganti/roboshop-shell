@@ -58,7 +58,7 @@ VALIDATE $? "Unzip the appication"
 npm install &>>$LOGFILE
 VALIDATE $? "Install the dependencies"
 
-cp catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
+cp /root/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
 VALIDATE $? "copy the catalogue service file"
 
 systemctl daemon-reload &>>$LOGFILE
