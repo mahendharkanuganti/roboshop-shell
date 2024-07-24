@@ -35,7 +35,7 @@ VALIDATE $? "Enable Nodejs version:20"
 dnf install nodejs -y &>>$LOGFILE
 VALIDATE $? "Install Nodejs"
 
-if [ "id roboshop" -ne 0 ]
+if [ $('id roboshop') -ne 0 ]
 then
     echo "roboshop user doesn't exist. continue with user creation"
     useradd roboshop
