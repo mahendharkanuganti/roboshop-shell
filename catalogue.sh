@@ -36,7 +36,7 @@ dnf install nodejs -y &>>$LOGFILE
 VALIDATE $? "Install Nodejs"
 
 id roboshop &>>$LOGFILE
-if [ $1 -ne 0 ]
+if [ $? -ne 0 ]
 then
     echo "roboshop user doesn't exist. continue with user creation"
     useradd roboshop &>>$LOGFILE
