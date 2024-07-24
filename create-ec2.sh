@@ -5,7 +5,7 @@ domain_name="mahidevops.cloud"
 hosted_zone_id="Z09453352UCEVDC5QWJID"
 
 for name in ${instances[0]}; do
-    if [ $name == "shipping" ] || [ $name == "mysql"]
+    if [ $name == "shipping" ] || [ $name == "mysql" ]
     then
         instance_type="t3.medium"
     else
