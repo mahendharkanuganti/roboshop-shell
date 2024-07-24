@@ -71,7 +71,7 @@ systemctl start catalogue &>>$LOGFILE
 VALIDATE $? "Start catalogue service"
 
 cp mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFILE
-VALIDATE $? "copy the MongoDB repo"
+VALIDATE $? "Copied mongo repo"
 
 dnf install -y mongodb-mongosh &>>$LOGFILE
 VALIDATE $? "Install the mongodb clinet"
