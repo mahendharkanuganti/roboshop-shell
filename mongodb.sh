@@ -14,7 +14,7 @@ VALIDATE(){
         echo -e "$2...$R FAILURE $N"
         exit 1
     else
-        echp -e "$2...$R SUCCESS $N"
+        echo -e "$2...$R SUCCESS $N"
     fi
 }
 
