@@ -4,7 +4,7 @@ instances=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipp
 domain_name="mahidevops.cloud"
 hosted_zone_id="Z09453352UCEVDC5QWJID"
 
-for name in ${instances[0]}; do
+for name in ${instances[@]}; do
     if [ $name == "shipping" ] || [ $name == "mysql" ]
     then
         instance_type="t3.medium"
