@@ -53,7 +53,7 @@ cd /app
 unzip /tmp/payment.zip &>>$LOGFILE
 VALIDATE $? "unzip the code"
 
-pip3.12 install -r requirements.txt &>>$LOGFILE
+pip3.9 install -r requirements.txt &>>$LOGFILE
 VALIDATE $? "Download and install the dependencies"
 
 cp /root/roboshop-shell/payment.service /etc/systemd/system/payment.service &>>$LOGFILE
