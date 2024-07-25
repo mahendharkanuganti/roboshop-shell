@@ -72,7 +72,7 @@ VALIDATE $? "Start the shipping service"
 dnf install mysql -y &>>$LOGFILE
 VALIDATE $? "Installing mysql client"
 
-mysql -h mysql.mahidevops.cloud -u root -pRoboShop@1 < /app/schema/shipping.sql &>>$LOGFILE
+mysql -h mysql.mahidevops.cloud -uroot -pRoboShop@1 < /app/schema/shipping.sql &>>$LOGFILE
 VALIDATE $? "Load the shipping application schema into MySQL Database"
 
 systemctl restart shipping &>>$LOGFILE
