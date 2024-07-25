@@ -72,7 +72,7 @@ VALIDATE $? "Enabling the user service"
 systemctl start user &>>$LOGFILE
 VALIDATE $? "Start the user service"
 
-cp mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
+cp /root/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
 VALIDATE $? "Copied mongo repo"
 
 dnf install mongodb-mongosh -y &>>$LOGFILE
