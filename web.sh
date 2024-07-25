@@ -46,7 +46,7 @@ rm -rf /tmp/web* &>>$LOGFILE
 VALIDATE $? "Remove the old Zipped content"
 
 unzip /tmp/web.zip &>>$LOGFILE
-VALIDATE$? "zip the content"
+VALIDATE $? "zip the content"
 
 
 
