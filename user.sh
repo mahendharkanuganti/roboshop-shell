@@ -52,7 +52,7 @@ mkdir /app &>>$LOGFILE
 VALIDATE $? "Create new /app directory"
 
 curl -L -o /tmp/user.zip https://roboshop-builds.s3.amazonaws.com/user.zip &>>$LOGFILE
-VALIDATE "Download the application code"
+VALIDATE $? "Download the application code"
 
 cd /app 
 unzip /tmp/user.zip &>>$LOGFILE
