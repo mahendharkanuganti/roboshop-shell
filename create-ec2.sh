@@ -1,6 +1,6 @@
 #!/bin/bash
 
-instances=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "web")
+instances=("mongodb" "redis" "mysql" "rabbitmq" "catalogue" "user" "cart" "shipping" "payment" "web" "dispatch")
 domain_name="mahidevops.cloud"
 hosted_zone_id="Z09453352UCEVDC5QWJID"
 
