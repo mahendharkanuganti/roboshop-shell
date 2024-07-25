@@ -29,9 +29,24 @@ fi
 dnf install nginx -y &>>$LOGFILE
 VALIDATE $? "Installing nginx"
 
-systemctl enable nginx
+systemctl enable nginx &>>$LOGFILE
 VALIDATE $? "Enabling nginx service"
 
-systemctl start nginx
+systemctl start nginx &>>$LOGFILE
 VALIDATE $? "Starting nginx service"
+
+rm -rf /usr/share/nginx/html/* &>>$LOGFILE
+VALIDATE $? "Remove the default application content"
+
+curl -o /tmp/web.zip https://roboshop-builds.s3.amazonaws.com/web.zip &>>$LOGFILE
+VALIDATE $? "download the frontend content"
+
+cd /usr/share/nginx/html &>>$LOGFILE
+rm -rf /tmp/web* &>>$LOGFILE
+VALIDATE $? "Remove the old Zipped content"
+
+unzip /tmp/web.zip &>>$LOGFILE
+VALIDATE$? "zip the content"
+
+
 
