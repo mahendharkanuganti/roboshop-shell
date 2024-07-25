@@ -65,7 +65,7 @@ systemctl enalbe payment &>>$LOGFILE
 VALIDATE "Enable the payment service"
 
 systemctl start payment &>>$LOGFILE
-VALIDATE $? "Start the payment service
+VALIDATE $? "Start the payment service"
 
 
 
