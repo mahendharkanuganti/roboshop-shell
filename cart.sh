@@ -41,6 +41,7 @@ if [ $? -ne 0 ]
 then
     echo "User roboshop doesn't exist. Proceed to add user"
     useradd roboshop
+    VALIDATE &? "Added roboshop user"
 else
     echo "roboshop user already exist"
 fi
