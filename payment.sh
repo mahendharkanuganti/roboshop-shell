@@ -61,12 +61,8 @@ VALIDATE $? "Copy the payment service file"
 
 systemctl daemon-reload &>>$LOGFILE
 
-systemctl enalbe payment &>>$LOGFILE
-VALIDATE "Enable the payment service"
+systemctl enable payment &>>LOGFILE
+VALIDATE $? "Enabling payment service"
 
 systemctl start payment &>>$LOGFILE
-VALIDATE $? "Start the payment service"
-
-
-
-
+VALIDATE $? "Starting payment service"
