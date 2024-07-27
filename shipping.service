@@ -4,7 +4,7 @@ Description=Shipping Service
 [Service]
 User=roboshop
 Environment=CART_ENDPOINT=cart.mahidevops.cloud:8080
-Environment=DB_HOST=<mysql.mahidevops.cloud
+Environment=DB_HOST=mysql.mahidevops.cloud
 ExecStart=/bin/java -jar /app/shipping.jar
 SyslogIdentifier=shipping
 
