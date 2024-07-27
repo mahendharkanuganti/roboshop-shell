@@ -49,7 +49,7 @@ cd /usr/share/nginx/html &>>$LOGFILE
 unzip /tmp/web.zip &>>$LOGFILE
 VALIDATE $? "unzip the content"
 
-cp /root/roboshop-shell/roboshop.conf /etc/nginx/default.d/roboshop.conf &>>$LOGFILE
+cp /home/ec2-user/roboshop-shell/roboshop.conf /etc/nginx/default.d/roboshop.conf &>>$LOGFILE
 VALIDATE $? "copy the roboshop configuration file"
 
 systemctl restart nginx  &>>$LOGFILE
