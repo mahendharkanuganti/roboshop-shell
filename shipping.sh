@@ -8,6 +8,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+MYSQL_HOST=mysql.daws78s.online
 
 VALIDATE(){
    if [ $1 -ne 0 ]
@@ -27,54 +28,64 @@ else
     echo "You are super user."
 fi
 
-dnf install maven -y &>>$LOGFILE
-VALIDATE $? "Installing Maven software"
 
-id roboshop &>>$LOGFILE
+dnf install maven -y &>> $LOGFILE
+VALIDATE $? "Installing Maven"
+
+id roboshop &>> $LOGFILE
 if [ $? -ne 0 ]
 then
-    echo "Roboshop used doesn't exist."
-    useradd roboshop &>>$LOGFILE
-    VALIDATE $? "Added roboshop user"
+    useradd roboshop &>> $LOGFILE
+    VALIDATE $? "Adding roboshop user"
 else
-    echo "roboshop user already exists"
+    echo -e "roboshop user already exist...$Y SKIPPING $N"
 fi
 
-rm -rf /app  &>>$LOGFILE 
-VALIDATE $? "Remove the old /app direcory"
+rm -rf /app &>> $LOGFILE
+VALIDATE $? "clean up existing directory"
 
-mkdir /app &>>$LOGFILE
-VALIDATE $? "Create new /app directory"
+mkdir -p /app &>> $LOGFILE
+VALIDATE $? "Creating app directory"
 
-curl -L -o /tmp/shipping.zip https://roboshop-builds.s3.amazonaws.com/shipping.zip &>>$LOGFILE
-VALIDATE $? "Downloading the application code"
+curl -L -o /tmp/shipping.zip https://roboshop-builds.s3.amazonaws.com/shipping.zip &>> $LOGFILE
+VALIDATE $? "Downloading shipping application"
 
-cd /app
-unzip /tmp/shipping.zip &>>$LOGFILE
-VALIDATE $? "unzip the code"
+cd /app  &>> $LOGFILE
+VALIDATE $? "Moving to app directory"
 
-mvn clean package &>>$LOGFILE
-VALIDATE $? "Build the application"
+unzip /tmp/shipping.zip &>> $LOGFILE
+VALIDATE $? "Extracting shipping application"
 
-mv target/shipping-1.0.jar shipping.jar &>>$LOGFILE
-VALIDATE $? "Rename the .jar file"
+mvn clean package &>> $LOGFILE
+VALIDATE $? "Packaging shipping"
 
-cp /root/roboshop-shell/shipping.service /etc/systemd/system/shipping.service &>>$LOGFILE
-VALIDATE $? "copy the shipping service configuration file"
+mv target/shipping-1.0.jar shipping.jar &>> $LOGFILE
+VALIDATE $? "Renaming the artifact"
 
-systemctl daemon-reload &>>$LOGFILE
-systemctl enable shipping &>>$LOGFILE
-VALIDATE $? "Enable the shipping service"
+cp /home/ec2-user/roboshop-shell/shipping.service /etc/systemd/system/shipping.service &>> $LOGFILE
+VALIDATE $? "Copying service file"
 
-systemctl start shipping &>>$LOGFILE
-VALIDATE $? "Start the shipping service"
+systemctl daemon-reload &>> $LOGFILE
+VALIDATE $? "Daemon reload"
 
-dnf install mysql -y &>>$LOGFILE
-VALIDATE $? "Installing mysql client"
+systemctl enable shipping  &>> $LOGFILE
+VALIDATE $? "Enabling shipping"
 
-mysql -h mysql.mahidevops.cloud -uroot -pRoboShop@1 < /app/schema/shipping.sql &>>$LOGFILE
-VALIDATE $? "Load the shipping application schema into MySQL Database"
+systemctl start shipping &>> $LOGFILE
+VALIDATE $? "Starting shipping"
 
-systemctl restart shipping &>>$LOGFILE
-VALIDATE $? "Restart the shipping service"
+dnf install mysql -y &>> $LOGFILE
+VALIDATE $? "Installing MySQL"
 
+mysql -h $MYSQL_HOST -uroot -pRoboShop@1 -e "use cities" &>> $LOGFILE
+if [ $? -ne 0 ]
+then
+    echo "Schema is ... LOADING"
+    mysql -h $MYSQL_HOST -uroot -pRoboShop@1 < /app/schema/shipping.sql &>> $LOGFILE
+    VALIDATE $? "Loading schema"
+else
+    echo -e "Schema already exists... $Y SKIPPING $N"
+fi
+
+systemctl restart shipping
+VALIDATE $? "Restarted Shipping"

@@ -8,6 +8,7 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+MONGO_HOST=mongodb.mahidevops.cloud
 
 VALIDATE(){
    if [ $1 -ne 0 ]
@@ -27,48 +28,49 @@ else
     echo "You are super user."
 fi
 
-dnf module disable nodejs -y &>>$LOGFILE
-VALIDATE $? "Disable the old nodejs versions"
+dnf module disable nodejs -y &>> $LOGFILE
+VALIDATE $? "Disabling current nodejs"
 
-dnf module enable nodejs:20 -y &>>$LOGFILE
-VALIDATE $? "Enable the nodejs version 20"
+dnf module enable nodejs:20 -y &>> $LOGFILE
+VALIDATE $? "Enabling nodejs:20"
 
-dnf install nodejs -y &>>$LOGFILE
-VALIDATE $? "Installing nodejs"
+dnf install nodejs -y &>> $LOGFILE
+VALIDATE $? "Installing NodeJS"
 
-id roboshop  &>>$LOGFILE
+id roboshop &>> $LOGFILE
 if [ $? -ne 0 ]
 then
-    echo "User roboshop doesn't exist. Proceed to add user"
-    useradd roboshop
-    VALIDATE &? "Added roboshop user"
+    useradd roboshop &>> $LOGFILE
+    VALIDATE $? "Adding roboshop user"
 else
-    echo "roboshop user already exist"
+    echo -e "roboshop user already exist...$Y SKIPPING $N"
 fi
 
-rm -rf /app  &>>$LOGFILE 
-VALIDATE $? "Remove the old /app direcory"
+rm -rf /app &>> $LOGFILE
+VALIDATE $? "clean up existing directory"
 
-mkdir /app &>>$LOGFILE
-VALIDATE $? "Create new /app directory"
+mkdir -p /app &>> $LOGFILE
+VALIDATE $? "Creating app directory"
 
-curl -L -o /tmp/cart.zip https://roboshop-builds.s3.amazonaws.com/cart.zip  &>>$LOGFILE
-VALIDATE $? "Download the application code"
+curl -o /tmp/cart.zip https://roboshop-builds.s3.amazonaws.com/cart.zip &>> $LOGFILE
+VALIDATE $? "downloading cart application"
 
-cd /app
-unzip /tmp/cart.zip &>>$LOGFILE
-VALIDATE $? "unzip the code"
+cd /app  &>> $LOGFILE
+VALIDATE $? "Moving to app directory"
 
-npm install &>>$LOGFILE
-VALIDATE $? "Download and install the dependencies"
+unzip /tmp/cart.zip &>> $LOGFILE
+VALIDATE $? "extracting cart"
 
-cp /root/roboshop-shell/cart.service /etc/systemd/system/cart.service &>>$LOGFILE
-VALIDATE $? "Copy the catrt sevice file"
+npm install &>> $LOGFILE
+VALIDATE $? "Installing dependencies"
 
-systemctl daemon-reload &>>$LOGFILE
+cp /home/ec2-user/roboshop-shell/cart.service /etc/systemd/system/cart.service &>> $LOGFILE
 
-systemctl enable cart &>>$LOGFILE
-VALIDATE $? "Enable cart service"
+systemctl daemon-reload &>> $LOGFILE
+VALIDATE $? "Daemon reload"
 
-systemctl start cart &>>$LOGFILE
-VALIDATE $? "Start the cart service"
+systemctl enable cart &>> $LOGFILE
+VALIDATE $? "Enable cart"
+
+systemctl start cart &>> $LOGFILE
+VALIDATE $? "Start cart"

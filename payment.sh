@@ -27,42 +27,44 @@ else
     echo "You are super user."
 fi
 
-dnf install python3.12 gcc python3-devel -y -y &>>$LOGFILE
-VALIDATE $? "Installing python"
+dnf install python3.11 gcc python3-devel -y &>> $LOGFILE
+VALIDATE $? "Installing Python"
 
-id roboshop &>>$LOGFILE
+id roboshop &>> $LOGFILE
 if [ $? -ne 0 ]
 then
-    echo "Roboshop used doesn't exist."
-    useradd roboshop &>>$LOGFILE
-    VALIDATE $? "Added roboshop user"
+    useradd roboshop &>> $LOGFILE
+    VALIDATE $? "Adding roboshop user"
 else
-    echo "roboshop user already exists"
+    echo -e "roboshop user already exist...$Y SKIPPING $N"
 fi
 
-rm -rf /app  &>>$LOGFILE 
-VALIDATE $? "Remove the old /app direcory"
+rm -rf /app &>> $LOGFILE
+VALIDATE $? "clean up existing directory"
 
-mkdir /app &>>$LOGFILE
-VALIDATE $? "Create new /app directory"
+mkdir -p /app &>> $LOGFILE
+VALIDATE $? "Creating app directory"
 
-curl -L -o /tmp/payment.zip https://roboshop-builds.s3.amazonaws.com/payment.zip &>>$LOGFILE
-VALIDATE $? "Downloading the application code"
+curl -L -o /tmp/payment.zip https://roboshop-builds.s3.amazonaws.com/payment.zip &>> $LOGFILE
+VALIDATE $? "Downloading shipping application"
 
-cd /app
-unzip /tmp/payment.zip &>>$LOGFILE
-VALIDATE $? "unzip the code"
+cd /app  &>> $LOGFILE
+VALIDATE $? "Moving to app directory"
 
-pip3.9 install -r requirements.txt &>>$LOGFILE
-VALIDATE $? "Download and install the dependencies"
+unzip /tmp/payment.zip &>> $LOGFILE
+VALIDATE $? "Extracting payment application"
 
-cp /root/roboshop-shell/payment.service /etc/systemd/system/payment.service &>>$LOGFILE
-VALIDATE $? "Copy the payment service file"
+pip3.11 install -r requirements.txt &>> $LOGFILE
+VALIDATE $? "Installing dependencies"
 
-systemctl daemon-reload &>>$LOGFILE
+cp /home/ec2-user/roboshop-shell/payment.service /etc/systemd/system/payment.service &>> $LOGFILE
+VALIDATE $? "Copying payment service"
 
-systemctl enable payment &>>LOGFILE
-VALIDATE $? "Enabling payment service"
+systemctl daemon-reload &>> $LOGFILE
+VALIDATE $? "Daemon reload"
 
-systemctl start payment &>>$LOGFILE
-VALIDATE $? "Starting payment service"
+systemctl enable payment &>> $LOGFILE
+VALIDATE $? "Enable payment"
+
+systemctl start payment &>> $LOGFILE
+VALIDATE $? "Start payment"

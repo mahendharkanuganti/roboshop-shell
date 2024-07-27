@@ -1,4 +1,5 @@
 #!/bin/bash
+
 USERID=$(id -u)
 TIMESTAMP=$(date +%F-%H-%M-%S)
 SCRIPT_NAME=$(echo $0 | cut -d "." -f1)
@@ -7,10 +8,11 @@ R="\e[31m"
 G="\e[32m"
 Y="\e[33m"
 N="\e[0m"
+MONGO_HOST=mongodb.mahidevops.cloud
 
 VALIDATE(){
-    if [ $1 -ne 0 ]
-    then
+   if [ $1 -ne 0 ]
+   then
         echo -e "$2...$R FAILURE $N"
         exit 1
     else
@@ -20,61 +22,72 @@ VALIDATE(){
 
 if [ $USERID -ne 0 ]
 then
-    echo "Please run this script with root access"
-    exit 1  # manually exit the script if error comes
+    echo "Please run this script with root access."
+    exit 1 # manually exit if error comes.
 else
-    echo "you are a super user"
+    echo "You are super user."
 fi
 
-dnf module disable nodejs -y &>>$LOGFILE
-VALIDATE $? "disble old version off Nodejs"
+dnf module disable nodejs -y &>> $LOGFILE
+VALIDATE $? "Disabling current nodejs"
 
-dnf module enable nodejs:20 -y &>>$LOGFILE
-VALIDATE $? "Enable Nodejs version:20"
+dnf module enable nodejs:20 -y &>> $LOGFILE
+VALIDATE $? "Enabling nodejs:20"
 
-dnf install nodejs -y &>>$LOGFILE
-VALIDATE $? "Install Nodejs"
+dnf install nodejs -y &>> $LOGFILE
+VALIDATE $? "Installing NodeJS"
 
-id roboshop &>>$LOGFILE
+id roboshop &>> $LOGFILE
 if [ $? -ne 0 ]
 then
-    echo "roboshop user doesn't exist. continue with user creation"
-    useradd roboshop &>>$LOGFILE
+    useradd roboshop &>> $LOGFILE
     VALIDATE $? "Adding roboshop user"
 else
-    echo "roboshop user already exist"
+    echo -e "roboshop user already exist...$Y SKIPPING $N"
 fi
 
-rm -rf /app &>>$LOGFILE
-mkdir /app &>>$LOGFILE
+rm -rf /app &>> $LOGFILE
+VALIDATE $? "clean up existing directory"
 
-curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>>$LOGFILE
-VALIDATE $? "Download the application"
+mkdir -p /app &>> $LOGFILE
+VALIDATE $? "Creating app directory"
 
-cd /app 
-unzip /tmp/catalogue.zip &>>$LOGFILE
-VALIDATE $? "Unzip the appication"
+curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip &>> $LOGFILE
+VALIDATE $? "downloading catalogue application"
 
-npm install &>>$LOGFILE
-VALIDATE $? "Install the dependencies"
+cd /app  &>> $LOGFILE
+VALIDATE $? "Moving to app directory"
 
-cp /root/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>>$LOGFILE
-VALIDATE $? "copy the catalogue service file"
+unzip /tmp/catalogue.zip &>> $LOGFILE
+VALIDATE $? "extracting catalogue"
 
-systemctl daemon-reload &>>$LOGFILE
-VALIDATE $? "Relaod the system daemon"
+npm install &>> $LOGFILE
+VALIDATE $? "Installing dependencies"
 
-systemctl enable catalogue &>>$LOGFILE
-VALIDATE $? "Enable catalogue service"
+cp /home/ec2-user/roboshop-shell/catalogue.service /etc/systemd/system/catalogue.service &>> $LOGFILE
 
-systemctl start catalogue &>>$LOGFILE
-VALIDATE $? "Start catalogue service"
+systemctl daemon-reload &>> $LOGFILE
+VALIDATE $? "Daemon reload"
 
-cp /root/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo &>>$LOGFILE
-VALIDATE $? "Copied mongo repo"
+systemctl enable catalogue &>> $LOGFILE
+VALIDATE $? "Enable catalogue"
 
-dnf install -y mongodb-mongosh &>>$LOGFILE
-VALIDATE $? "Install the mongodb clinet"
+systemctl start catalogue &>> $LOGFILE
+VALIDATE $? "Start catalogue"
 
-mongosh --host mongodb.mahidevops.cloud </app/schema/catalogue.js &>>$LOGFILE
-VALIDATE $? "Load the catalogue application schema to MongoDB"
+cp /home/ec2-user/roboshop-shell/mongo.repo /etc/yum.repos.d/mongo.repo &>> $LOGFILE
+VALIDATE $? "Copying mongo repo"
+
+dnf install -y mongodb-mongosh &>> $LOGFILE
+VALIDATE $? "Installing mongo client"
+
+SCHEMA_EXISTS=$(mongosh --host $MONGO_HOST --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')") &>> $LOGFILE
+
+if [ $SCHEMA_EXISTS -lt 0 ]
+then
+    echo "Schema does not exists ... LOADING"
+    mongosh --host $MONGO_HOST </app/schema/catalogue.js &>> $LOGFILE
+    VALIDATE $? "Loading catalogue data"
+else
+    echo -e "schema already exists... $Y SKIPPING $N"
+fi
